@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Farm Admin Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    background-color: #2c3e50;
+    width: 250px;
+    height: 100vh;
+    padding-top: 30px;
+    position: fixed;
+    transition: width 0.3s;
+}
+
+.sidebar h2 {
+    color: #ecf0f1;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin: 15px 0;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #bdc3c7;
+    display: block;
+    padding: 10px 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+/* Main Content Styling */
+.main-content {
+    margin-left: 250px;
+    padding: 40px;
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    transition: margin-left 0.3s;
+}
+
+header h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* Dashboard Overview Cards */
+.overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.overview-card {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.overview-card:hover {
+    transform: translateY(-5px);
+    background-color: #ecf0f1;
+}
+
+.overview-card h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.overview-card p {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+/* Content Sections */
+.content-section {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.content-section h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.content-section p {
+    margin-bottom: 20px;
+    color: #7f8c8d;
+}
+
+.content-section button {
+    padding: 10px 20px;
+    background-color: #e67e22;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.content-section button:hover {
+    background-color: #d35400;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with transparency */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #7f8c8d;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content form label {
+    color: #2c3e50;
+}
+
+.modal-content form input,
+.modal-content form select,
+.modal-content form button {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+}
+
+.modal-content form button {
+    background-color: #e67e22;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-content form button:hover {
+    background-color: #d35400;
+}
+
+table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            table, th, td {
+                display: block;
+                width: 100%;
+            }
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            td {
+                padding: 10px;
+                position: relative;
+                text-align: right;
+            }
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+        }
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .overview {
+        grid-template-columns: 1fr;
+    }
+
+    /* Hamburger Menu for Mobile */
+    .sidebar h2 {
+        display: none;
+    }
+
+    .sidebar ul li a {
+        padding: 10px;
+        text-align: center;
+    }
+}
+
+</style>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>JUDIF FARM</h2>
+        <ul>
+            <li><a href="#" class="active" data-target="dashboard">Dashboard</a></li>
+            <li><a href="#" data-target="livestock">Livestock Operations</a></li>
+            <li><a href="#" data-target="financial">Financial Management</a></li>
+            <li><a href="#" data-target="Human Resources">Human Resources</a></li>
+            <li><a href="#" data-target="sales">Sales & Marketing</a></li>
+            <li><a href="#" data-target="feed store">Feed Store</a></li>
+            <li><a href="#" data-target="products store">Products Store</a></li>
+           <li><a href="#" data-target="quality">Quality Control</a></li>
+            <li><a href="#" data-target="it">IT Management</a></li>
+            <li><a href="#" data-target="sustainability">Sustainability</a></li>
+            <li><a href="#" data-target="legal">Legal & Compliance</a></li>
+            <li><a href="#" data-target="logout">Log Out</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <h1>Welcome to JUDIF FARM Administration Portal</h1>
+        </header>
+
+        <!-- Dashboard Overview -->
+        <section id="dashboard" class="content-section active">
+            <h2>Dashboard Overview</h2>
+            <div class="overview">
+                <div class="overview-card" data-target="livestock">
+                    <h3>Livestock Operations</h3>
+                    <p>Manage all aspects of livestock including birds, fish, pigs, and egg production.</p>
+                </div>
+
+                <div class="overview-card" data-target="financial">
+                    <h3>Financial Management</h3>
+                    <p>Handle budgeting, accounting, and financial planning.</p>
+                </div>
+
+                <div class="overview-card" data-target="Human Resources">
+                    <h3>Human Resources</h3>
+                    <p>Manage recruitment, training, and employee welfare.</p>
+                </div>
+
+                <div class="overview-card" data-target="sales">
+                    <h3>Sales & Marketing</h3>
+                    <p>Develop strategies to market and sell farm products.</p>
+                </div>
+                <div class="overview-card" data-target="sales">
+                    <h3>Feed Store</h3>
+                    <p>Develop strategies to store farm consumables .</p>
+                </div>
+
+                <div class="overview-card" data-target="sales">
+                    <h3>Products Store</h3>
+                    <p>Develop strategies to store product in an organize manner.</p>
+                </div>
+
+                <div class="overview-card" data-target="logistics">
+                    <h3>Logistics & Distribution</h3>
+                    <p>Oversee transportation and storage of farm products.</p>
+                </div>
+
+                <div class="overview-card" data-target="quality">
+                    <h3>Quality Control</h3>
+                    <p>Ensure products meet health and safety standards.</p>
+                </div>
+
+                <div class="overview-card" data-target="it">
+                    <h3>IT Management</h3>
+                    <p>Manage technological infrastructure and innovations.</p>
+                </div>
+
+                <div class="overview-card" data-target="sustainability">
+                    <h3>Sustainability</h3>
+                    <p>Implement eco-friendly and sustainable farming practices.</p>
+                </div>
+
+                <div class="overview-card" data-target="legal">
+                    <h3>Legal & Compliance</h3>
+                    <p>Ensure adherence to laws and regulations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example Department Section -->
+        <section id="livestock" class="content-section">
+            <h2>Livestock Operations</h2>
+               <button class="open-modal-btn" data-modal="livestockModal">Add New Record</button>
+
+            <!-- Livestock Modal -->
+            <div id="livestockModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2>Add Livestock Record</h2>
+                    <form>
+                        <label for="type">Type:</label>
+                        <select id="type" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="birds">Birds</option>
+                            <option value="fish">Fish</option>
+                            <option value="pigs">Pigs</option>
+                        </select>
+
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" required>
+
+                        <label for="health">Health Status:</label>
+                        <input type="text" id="health" name="health" required>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Repeat similar sections for other departments -->
+
+        <!-- Financial Management Section -->
+        <section id="financial" class="content-section">
+            <h2>Financial Management</h2>
+            <p>Handle budgeting, accounting, and financial planning.</p>
+            <button class="open-modal-btn" data-modal="financialModal">Add Financial Record</button>
+
+            <!-- Financial Modal -->
+            <div id="financialModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2>Add Financial Record</h2>
+                    <form>
+                        <label for="expense">Expense:</label>
+                        <input type="text" id="expense" name="expense" required>
+
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" name="amount" required>
+
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" required>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+ <!-- Financial Management Section -->
+ <section id="Human Resources" class="content-section">
+    <h2>Human Resources</h2>
+    <p>Handle budgeting, accounting, and financial planning.</p>
+    
+    <h2>View Workers</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Position</th>
+                <th>Sex</th>
+                <th>Status</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-label="Name">John Doe</td>
+                <td data-label="Phone Number">123-456-7890</td>
+                <td data-label="Position">Manager</td>
+                <td data-label="Sex">Male</td>
+                <td data-label="Status">Active</td>
+                <td data-label="Age">35</td>
+            </tr>
+            <tr>
+                <td data-label="Name">Jane Smith</td>
+                <td data-label="Phone Number">098-765-4321</td>
+                <td data-label="Position">HR Officer</td>
+                <td data-label="Sex">Female</td>
+                <td data-label="Status">On Leave</td>
+                <td data-label="Age">29</td>
+            </tr>
+            <tr>
+                <td data-label="Name">Michael Brown</td>
+                <td data-label="Phone Number">555-123-4567</td>
+                <td data-label="Position">Technician</td>
+                <td data-label="Sex">Male</td>
+                <td data-label="Status">Active</td>
+                <td data-label="Age">40</td>
+            </tr>
+            <!-- Additional rows can be added here -->
+        </tbody>
+    </table>
+    <button class="open-modal-btn" data-modal="Human ResourcesModal">Add users</button>
+
+    <!-- Financial Modal -->
+    <div id="Human Resources" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Add Financial Record</h2>
+            <form>
+                <label for="expense">Expense:</label>
+                <input type="text" id="expense" name="expense" required>
+
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" required>
+
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+ <!-- Example Department Section -->
+ <section id="sales" class="content-section">
+    <h2>Livestock Operations</h2>
+    <style>
+    .form-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0 5px;
+    }
+
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .form-container {
+            width: 100%;
+            padding: 15px;
+        }
+    }
+</style>
+
+
+
+<div class="form-container">
+    <h2>Enter Livestock Sales</h2>
+    <form action="#" method="POST">
+        <label for="livestock-type">Livestock Type:</label>
+        <select id="livestock-type" name="livestock-type">
+            <option value="bird">Bird</option>
+            <option value="pig">Pig</option>
+            <option value="egg">Egg</option>
+            <option value="fish">Fish</option>
+        </select>
+
+        <label for="quantity">Quantity Sold:</label>
+        <input type="number" id="quantity" name="quantity" placeholder="Enter quantity" required>
+
+        <label for="price">Price per Unit (₦):</label>
+        <input type="number" id="price" name="price" placeholder="Enter price per unit" required>
+
+        <label for="total-sales">Total Sales (₦):</label>
+        <input type="number" id="total-sales" name="total-sales" placeholder="Auto-calculated" readonly>
+
+        <button type="submit">Submit Sales</button>
+    </form>
+</div>
+
+<script>
+    // Auto-calculate total sales based on quantity and price per unit
+    const quantityInput = document.getElementById('quantity');
+    const priceInput = document.getElementById('price');
+    const totalSalesInput = document.getElementById('total-sales');
+
+    quantityInput.addEventListener('input', calculateTotal);
+    priceInput.addEventListener('input', calculateTotal);
+
+    function calculateTotal() {
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        totalSalesInput.value = quantity * price;
+    }
+</script>
+       <button class="open-modal-btn" data-modal="sales">Add Record</button>
+
+   
+</section>
+
+
+        <!-- Add more sections for HR, Sales, Logistics, Quality Control, IT, Sustainability, Legal, etc. -->
+    </div>
+
+    <!-- JavaScript for Modal and Navigation -->
+    <script>
+        // Navigation Handling
+const navLinks = document.querySelectorAll('.sidebar ul li a');
+const contentSections = document.querySelectorAll('.content-section');
+const overviewCards = document.querySelectorAll('.overview-card');
+
+// Function to deactivate all links and hide all sections
+function deactivateAll() {
+    navLinks.forEach(link => link.classList.remove('active'));
+    contentSections.forEach(section => section.classList.remove('active'));
+}
+
+// Add click event to navigation links
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.getAttribute('data-target');
+
+        deactivateAll();
+        link.classList.add('active');
+        document.getElementById(target).classList.add('active');
+    });
+});
+
+// Add click event to overview cards to navigate to respective sections
+overviewCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const target = card.getAttribute('data-target');
+        deactivateAll();
+        // Activate corresponding navigation link
+        document.querySelector(`.sidebar ul li a[data-target="${target}"]`).classList.add('active');
+        // Show corresponding content section
+        document.getElementById(target).classList.add('active');
+    });
+});
+
+// Modal Handling
+const openModalButtons = document.querySelectorAll('.open-modal-btn');
+const closeModalButtons = document.querySelectorAll('.close-btn');
+
+// Function to open modal
+openModalButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const modalId = button.getAttribute('data-modal');
+        document.getElementById(modalId).style.display = 'flex';
+    });
+});
+
+// Function to close modal
+closeModalButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const modal = button.closest('.modal');
+        modal.style.display = 'none';
+    });
+});
+
+// Close modal when clicking outside the modal content
+window.addEventListener('click', (event) => {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+});
+
+    </script>
+</body>
+</html>
